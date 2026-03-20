@@ -4,14 +4,15 @@ import "./App.css";
 const API = import.meta.env.VITE_API_URL;
 
 function App() {
-
+ console.log("API:", import.meta.env.VITE_API_URL); // ✅ ADD HERE
   const [products, setProducts] = useState([]);
 
   const [form, setForm] = useState({
     name: "",
-    price: "",
+    price: 0,
     category: "",
   });
+  
 
   const [editId, setEditId] = useState(null);
 
