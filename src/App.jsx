@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
+
 const API = import.meta.env.VITE_API_URL;
 
 function App() {
- console.log("API:", import.meta.env.VITE_API_URL); // ✅ ADD HERE
+
+  console.log("API:", API);
+
   const [products, setProducts] = useState([]);
 
   const [form, setForm] = useState({
     name: "",
-    price: 0,
+    price: "",
     category: "",
   });
-  
 
   const [editId, setEditId] = useState(null);
 
@@ -22,32 +24,29 @@ function App() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // PAGINATION STATE
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-
-
-  // Fetch products
+  // ✅ Fetch products
   const fetchProducts = async () => {
-  const res = await axios.get(`${API}/products`);
-  setProducts(res.data);
-};
+    try {
+      const res = await axios.get(`${API}/products`);
+      setProducts(res.data);
+    } catch (err) {
+      console.log("FETCH ERROR:", err);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
-
-
-  // Input change
+  // ✅ Handle input
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-
-
-  // Submit form
+  // ✅ Submit form (FIXED)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,12 +58,18 @@ function App() {
 
     try {
 
+      const payload = {
+        name: form.name,
+        price: Number(form.price), // ✅ FIX (IMPORTANT)
+        category: form.category,
+      };
+
       if (editId) {
-        await axios.put(`${API}/products/${editId}`, form);
+        await axios.put(`${API}/products/${editId}`, payload);
         setSuccess("✅ Product updated successfully");
         setEditId(null);
       } else {
-        await axios.post(`${API}/products`, form);
+        await axios.post(`${API}/products`, payload);
         setSuccess("🎉 Product added successfully");
       }
 
@@ -78,79 +83,60 @@ function App() {
       }, 3000);
 
     } catch (err) {
+      console.log("POST ERROR:", err.response?.data); // ✅ DEBUG
       setError("❌ Something went wrong");
     }
   };
 
-
-
-  // Edit product
+  // ✅ Edit
   const handleEdit = (product) => {
     setForm({
       name: product.name,
       price: product.price,
       category: product.category,
     });
-
     setEditId(product.id);
   };
 
-
-
-  // Delete product
+  // ✅ Delete (FIXED API)
   const handleDelete = async (id) => {
-
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      await axios.delete(`http://localhost:5000/products/${id}`);
-      fetchProducts();
+    if (window.confirm("Are you sure?")) {
+      try {
+        await axios.delete(`${API}/products/${id}`); // ✅ FIX
+        fetchProducts();
+      } catch (err) {
+        console.log("DELETE ERROR:", err);
+      }
     }
-
   };
 
-
-
-  // Filter products
+  // Filter
   let filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(filter.toLowerCase())
   );
-
-
 
   // Sorting
   if (sortBy === "name") {
     filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
   }
-
   if (sortBy === "priceLow") {
     filteredProducts.sort((a, b) => a.price - b.price);
   }
-
   if (sortBy === "priceHigh") {
     filteredProducts.sort((a, b) => b.price - a.price);
   }
-
   if (sortBy === "latest") {
     filteredProducts.sort((a, b) => b.id - a.id);
   }
-
   if (sortBy === "oldest") {
     filteredProducts.sort((a, b) => a.id - b.id);
   }
 
-
-
-  // PAGINATION LOGIC
+  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-  const currentProducts = filteredProducts.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-
+  const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-
-
 
   return (
     <div className="container">
@@ -160,46 +146,20 @@ function App() {
       {error && <p className="error">{error}</p>}
       {success && <p className="success">{success}</p>}
 
-
-
       <form onSubmit={handleSubmit}>
-
-        <input
-          name="name"
-          placeholder="Product Name"
-          value={form.name}
-          onChange={handleChange}
-        />
-
-        <input
-          name="price"
-          placeholder="Price"
-          value={form.price}
-          onChange={handleChange}
-        />
-
-        <input
-          name="category"
-          placeholder="Category"
-          value={form.category}
-          onChange={handleChange}
-        />
-
+        <input name="name" placeholder="Product Name" value={form.name} onChange={handleChange} />
+        <input name="price" placeholder="Price" value={form.price} onChange={handleChange} />
+        <input name="category" placeholder="Category" value={form.category} onChange={handleChange} />
         <button type="submit">
           {editId ? "Update Product" : "Add Product"}
         </button>
-
       </form>
-
-
 
       <h3>Filter & Sort</h3>
 
       <div className="filter-sort">
-
         <input
-          className="filter-input"
-          placeholder="Search by product name"
+          placeholder="Search"
           value={filter}
           onChange={(e) => {
             setFilter(e.target.value);
@@ -207,121 +167,38 @@ function App() {
           }}
         />
 
-        <select
-          className="sort-select"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-
-          <option value="">Sort By</option>
-          <option value="name">Name A-Z</option>
-          <option value="priceLow">Price Low → High</option>
-          <option value="priceHigh">Price High → Low</option>
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="">Sort</option>
+          <option value="name">Name</option>
+          <option value="priceLow">Low</option>
+          <option value="priceHigh">High</option>
           <option value="latest">Latest</option>
           <option value="oldest">Oldest</option>
-
         </select>
-
       </div>
 
-
-
-      <h2>Product List</h2>
-
       <table>
-
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Category</th>
-            <th>Actions</th>
+            <th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
-
-  {filter !== "" && currentProducts.length === 0 ? (
-
-    <tr>
-      <td colSpan="5" className="no-data">
-        ❌ No products found for "{filter}"
-      </td>
-    </tr>
-
-  ) : (
-
-    currentProducts.map((product) => (
-
-      <tr key={product.id}>
-
-        <td>{product.id}</td>
-        <td>{product.name}</td>
-        <td>{product.price}</td>
-        <td>{product.category}</td>
-
-        <td>
-
-          <button
-            className="edit-btn"
-            onClick={() => handleEdit(product)}
-          >
-            Edit
-          </button>
-
-          <button
-            className="delete-btn"
-            onClick={() => handleDelete(product.id)}
-          >
-            Delete
-          </button>
-
-        </td>
-
-      </tr>
-
-    ))
-
-  )}
-
-</tbody>
-
+          {currentProducts.map((p) => (
+            <tr key={p.id}>
+              <td>{p.id}</td>
+              <td>{p.name}</td>
+              <td>{p.price}</td>
+              <td>{p.category}</td>
+              <td>
+                <button onClick={() => handleEdit(p)}>Edit</button>
+                <button onClick={() => handleDelete(p.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
       </table>
-
-
-
-      {/* PAGINATION */}
-
-      <div className="pagination">
-
-        <button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage(currentPage - 1)}
-        >
-          Prev
-        </button>
-
-        {[...Array(totalPages)].map((_, index) => (
-
-          <button
-            key={index}
-            className={currentPage === index + 1 ? "active-page" : ""}
-            onClick={() => setCurrentPage(index + 1)}
-          >
-            {index + 1}
-          </button>
-
-        ))}
-
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          Next
-        </button>
-
-      </div>
 
     </div>
   );
