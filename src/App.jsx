@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
+const API = import.meta.env.VITE_API_URL;
 
 function App() {
 
@@ -28,9 +29,9 @@ function App() {
 
   // Fetch products
   const fetchProducts = async () => {
-    const res = await axios.get("http://localhost:5000/products");
-    setProducts(res.data);
-  };
+  const res = await axios.get(`${API}/products`);
+  setProducts(res.data);
+};
 
   useEffect(() => {
     fetchProducts();
@@ -58,11 +59,11 @@ function App() {
     try {
 
       if (editId) {
-        await axios.put(`http://localhost:5000/products/${editId}`, form);
+        await axios.put(`${API}/products/${editId}`, form);
         setSuccess("✅ Product updated successfully");
         setEditId(null);
       } else {
-        await axios.post("http://localhost:5000/products", form);
+        await axios.post(`${API}/products`, form);
         setSuccess("🎉 Product added successfully");
       }
 
