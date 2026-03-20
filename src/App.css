@@ -1,0 +1,186 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+/* CONTAINER */
+
+.container {
+  width: 100%;
+  max-width: 1000px;
+
+  background: white;
+  padding: 30px;
+
+  border-radius: 10px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+}
+
+/* HEADINGS */
+
+h2, h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* FORM */
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+form input {
+  flex: 1;
+  min-width: 150px;
+}
+
+input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* BUTTON */
+
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #3498db;
+  color: white;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+/* FILTER + SORT */
+
+.filter-sort {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.filter-input {
+  flex: 1;
+}
+
+.sort-select {
+  padding: 10px;
+}
+
+/* TABLE */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+table th {
+  background: #f2f2f2;
+}
+
+/* ACTION BUTTONS */
+
+.edit-btn {
+  background: orange;
+  margin-right: 8px;
+}
+
+.delete-btn {
+  background: red;
+}
+
+/* MESSAGES */
+
+.error {
+  background: #ffe6e6;
+  color: red;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.success {
+  background: #d4edda;
+  color: green;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 15px;
+  border-radius: 5px;
+}
+
+.no-data {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* PAGINATION */
+
+.pagination{
+  margin-top:20px;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+}
+
+.pagination button{
+  background:#eee;
+  color:black;
+}
+
+.pagination button:hover{
+  background:#3498db;
+  color:white;
+}
+
+.active-page{
+  background:#3498db !important;
+  color:white;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+
+  form {
+    flex-direction: column;
+  }
+
+  .filter-sort {
+    flex-direction: column;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+
+}
